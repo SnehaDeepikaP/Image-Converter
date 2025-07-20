@@ -333,6 +333,7 @@ def process_single_image(args):
                 save_kwargs = {'quality': 90, 'method': 6}
             
             # Save the image
+            save_kwargs['dpi'] = (300, 300)
             img.save(output_path, save_format, **save_kwargs)
             print(f"Successfully saved: {output_path}")
         
@@ -397,8 +398,8 @@ def upload():
         adjust_brightness = request.form.get('adjust_brightness') == 'on'
         custom_dimensions = request.form.get('custom_dimensions') == 'on'
         
-        target_width = None
-        target_height = None
+        target_width = 413
+        target_height = 531
         if custom_dimensions:
             try:
                 width_str = request.form.get('width', '').strip()
