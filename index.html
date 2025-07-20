@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Converter Pro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        footer {
+            margin-top: 40px;
+            background: #764ba2;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.95rem;
+            border-radius: 0 0 20px 20px;
+        }
+
+        footer a {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .option-group {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .option-group:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .option-group h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-group h3::before {
+            content: "⚙️";
+            margin-right: 10px;
+        }
+
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-group label:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .select-group {
+            margin-bottom: 15px;
+        }
+
+        .select-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .select-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .select-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .dimensions-group {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .dimensions-group.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dimensions-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .dimension-input {
+            flex: 1;
+        }
+
+        .dimension-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .dimension-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .dimension-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .convert-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            display: none;
+            padding: 15px;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .success-message {
+            display: none;
+            padding: 15px;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 8px;
+            color: #004085;
+        }
+
+        .features {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .features h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-item h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .feature-item p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .dimensions-inputs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> AI Image Converter Pro</h1>
+            <p>Convert, enhance, and crop images with intelligent face detection</p>
+        </div>
+
+        <div class="form-container">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="upload-area" onclick="document.getElementById('zipFile').click()">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click to select or drag & drop your archive</div>
+                    <div class="upload-subtext">Supports ZIP and RAR files containing images (PNG, JPG, WEBP, HEIC, etc.)</div>
+                    <input type="file" id="zipFile" name="zipFile" class="file-input" accept=".zip,.rar" required>
+                </div>
+
+                <div class="file-info" id="fileInfo">
+                    <strong>Selected file:</strong> <span id="fileName"></span><br>
+                    <strong>Size:</strong> <span id="fileSize"></span>
+                </div>
+
+                <div class="options-grid">
+                    <div class="option-group">
+                        <h3>Output Format</h3>
+                        <div class="select-group">
+                            <label for="format">Choose format:</label>
+                            <select name="format" id="format">
+                                <option value="jpg">JPEG (.jpg) - Best for photos</option>
+                                <option value="png">PNG (.png) - Best for graphics</option>
+                                <option value="webp">WebP (.webp) - Modern format</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <h3>Processing Options</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="crop_faces" id="cropFaces">
+                                <span> Smart Face Cropping</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="enhance_quality" id="enhanceQuality" checked>
+                                <span> Enhance Image Quality</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="adjust_brightness" id="adjustBrightness" checked>
+                                <span> Auto Brightness Adjustment</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <h3>Custom Dimensions</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="custom_dimensions" id="customDimensions">
+                                <span> Set Custom Size</span>
+                            </label>
+                        </div>
+                        <div class="dimensions-group" id="dimensionsGroup">
+                            <div class="dimensions-inputs">
+                                <div class="dimension-input">
+                                    <label for="width">Width (px):</label>
+                                    <input type="number" name="width" id="width" min="50" max="4000" placeholder="800">
+                                </div>
+                                <div class="dimension-input">
+                                    <label for="height">Height (px):</label>
+                                    <input type="number" name="height" id="height" min="50" max="4000" placeholder="600">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="convert-btn" id="convertBtn">
+                     Convert & Download Images
+                </button>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Processing images...</div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+            </form>
+        </div>
+
+        <div class="features">
+            <h3> Key Features</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h4>🤖 AI Face Detection</h4>
+                    <p>Intelligent face cropping with proper centering for perfect portraits</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4>🎨 Quality Enhancement</h4>
+                    <p>Automatic brightness, contrast, and sharpness improvements</p>
+                </div>
+                <div class="feature-item">
+                    <h4>📱 Multiple Formats</h4>
+                    <p>Support for HEIC, PNG, JPG, WebP, and more formats</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadArea = document.querySelector('.upload-area');
+        const fileInput = document.getElementById('zipFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const customDimensionsCheckbox = document.getElementById('customDimensions');
+        const dimensionsGroup = document.getElementById('dimensionsGroup');
+        const convertBtn = document.getElementById('convertBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        // File drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+
+        // File selection
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.style.display = 'block';
+                
+                // Check file type
+                const validTypes = ['.zip', '.rar'];
+                const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validTypes.includes(fileExt)) {
+                    showError('Please select a ZIP or RAR file.');
+                    fileInput.value = '';
+                    fileInfo.style.display = 'none';
+                    return;
+                }
+                
+                hideMessages();
+            }
+        }
+
+        // Custom dimensions toggle
+        customDimensionsCheckbox.addEventListener('change', () => {
+            if (customDimensionsCheckbox.checked) {
+                dimensionsGroup.classList.add('show');
+            } else {
+                dimensionsGroup.classList.remove('show');
+            }
+        });
+
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!fileInput.files[0]) {
+                showError('Please select a file first.');
+                return;
+            }
+            
+            // Validate custom dimensions if enabled
+            if (customDimensionsCheckbox.checked) {
+                const width = document.getElementById('width').value;
+                const height = document.getElementById('height').value;
+                
+                if (!width || !height) {
+                    showError('Please enter both width and height for custom dimensions.');
+                    return;
+                }
+                
+                if (width <= 0 || height <= 0) {
+                    showError('Width and height must be positive numbers.');
+                    return;
+                }
+                
+                if (width > 4000 || height > 4000) {
+                    showError('Maximum dimension is 4000 pixels.');
+                    return;
+                }
+            }
+            
+            try {
+                hideMessages();
+                showProgress();
+                setButtonLoading(true);
+                
+                const formData = new FormData(uploadForm);
+                
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload failed');
+                }
+                
+                // Get the filename from response headers
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'converted_images.zip';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        filename = filenameMatch[1].replace(/['"]/g, '');
+                    }
+                }
+                
+                // Create blob and download
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                showSuccess(`Successfully converted images! Download should start automatically.`);
+                updateProgress(100, 'Conversion completed successfully!');
+                
+                // Reset form after success
+                setTimeout(() => {
+                    resetForm();
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message || 'An error occurred during conversion. Please try again.');
+            } finally {
+                setButtonLoading(false);
+            }
+        });
+
+        // Utility functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showProgress() {
+            progressContainer.style.display = 'block';
+            updateProgress(0, 'Starting conversion...');
+        }
+
+        function hideProgress() {
+            progressContainer.style.display = 'none';
+        }
+
+        function updateProgress(percent, text) {
+            progressFill.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        function setButtonLoading(loading) {
+            convertBtn.disabled = loading;
+            if (loading) {
+                convertBtn.textContent = '⏳ Processing...';
+            } else {
+                convertBtn.textContent = '🚀 Convert & Download Images';
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            hideProgress();
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        function resetForm() {
+            uploadForm.reset();
+            fileInfo.style.display = 'none';
+            dimensionsGroup.classList.remove('show');
+            hideProgress();
+            hideMessages();
+            setButtonLoading(false);
+        }
+
+        // Auto-hide success message after 5 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => {
+                if (successMessage.style.display === 'block') {
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 5000);
+                }
+            }, 100);
+        });
+    </script>
+<!-- Footer -->
+<footer style="margin-top: 40px; background: #764ba2; color: white; text-align: center; padding: 20px; font-size: 0.95rem; border-radius: 0 0 20px 20px;">
+    <p>Created with ❤️ by <strong>P. Sneha Deepika</strong></p>
+    <p>📧 <a href="psnehadeepika2006@gmail.com" style="color: #fff; text-decoration: underline;">psnehadeepika2006@gmail.com</a></p>
+</footer>
+
+</body>
+</html>

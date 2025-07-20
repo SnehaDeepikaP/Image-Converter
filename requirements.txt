@@ -1,0 +1,6 @@
+flask
+flask-cors
+pillow
+opencv-python-headless
+pillow-heif
+rarfile
